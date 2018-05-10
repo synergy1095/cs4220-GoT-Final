@@ -10,7 +10,7 @@ Vue.component('input-search', {
             this.$emit('input', value)
         }
     }
-});
+})
 
 const searchComponent = {
     template: `<div id="searchAndNotifications" class="text-center">
