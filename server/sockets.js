@@ -51,7 +51,6 @@ module.exports = (server) => {
                     })
                     .catch(err => io.emit('error-api', err))
             } else {
-                // console.log(prevSearched)
                 io.emit('retrieved-prev-result', prevSearched)
             }
         })
