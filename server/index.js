@@ -1,9 +1,12 @@
+//index.js----------------------------------------------------------------------------------------------------------------------------------------
 const
     config = require('./config'),
     superagent = require('superagent')
-    queryTypes = {'books' : ['show all', 'name'], 
-                'characters' : ['show all', 'name', 'male', 'female', 'culture', 'alive', 'dead'],
-                'houses' : ['show all', 'name', 'region']}
+queryTypes = {
+    'books': ['show all', 'name'],
+    'characters': ['show all', 'name', 'male', 'female', 'culture', 'alive', 'dead'],
+    'houses': ['show all', 'name', 'region']
+}
 
 const _fetch = (command) => {
     // console.log(`${config.url}/${command}`)
@@ -13,7 +16,7 @@ const _fetch = (command) => {
 }
 
 exports.search = (type, page = 1, pageSize = 10, queryType = null, query = null) => {
-    return _fetch(query ? `${type}?page=${page}&pageSize=${pageSize}&${queryType}=${query}` 
+    return _fetch(query ? `${type}?page=${page}&pageSize=${pageSize}&${queryType}=${query}`
         : `${type}?page=${page}&pageSize=${pageSize}`)
 }
 
@@ -30,9 +33,4 @@ exports.getTypes = () => {
     for (let key in queryTypes)
         foundTypes.push(key)
     return foundTypes
-}
-
-//old stuff
-exports.character = (name) => {
-    return _fetch(`houses/?region=${name}`)
 }

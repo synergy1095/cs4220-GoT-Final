@@ -27,15 +27,12 @@
         <div class="container-fluid h-100 position-inherit">
             <div class="row h-100">
                 <div id="leftCol" class="col-sm-3">
-                    <div id="searchAndNotifications" class="text-center">
-                        <h3 class="text-left">Search</h3>
-                        <input @keyup.enter="searchHandler" v-model="search" placeholder="ENTER A REGION EG. THE VALE, IRON ISLANDS, ETC" type="text">
-                        <div v-show="message">
-                            <h5>{{message}}</h5>
-                        </div>
-                    </div>
+                    <!-- search -->
+                    <search-component id="searchComponent" :categories="categories" :selected="selected" :message="message" @input="searchUpdate"
+                        @update="selectUpdate"></search-component>
                     <!-- search history -->
                     <history-component id="historyComponent" v-show="searched.length" v-bind:searched="searched"></history-component>
+
                 </div>
                 <div id="rightCol" class="col-sm-9 bg-white">
                     <!-- search results -->

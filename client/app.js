@@ -1,12 +1,51 @@
-import { character } from "../server";
-
+//app.js----------------------------------------------------------------------------------------------------------------------------------------
+Vue.config.devtools = true;
 // App components
+Vue.component('input-search', {
+    props: ['value'],
+    template: `
+    <input @keyup.enter="updateSelf($event.target.value)" :value="value" placeholder="ENTER YOUR QUERY" type="text">`,
+    methods: {
+        updateSelf(value) {
+            console.log('input-search: ' + value)
+            this.$emit('input', value)
+        }
+    }
+});
+
+const searchComponent = {
+    template: `<div id="searchAndNotifications" class="text-center">
+					<h3 class="text-left">Search</h3>
+					<select v-bind:value="selected" @change="updateSelect">
+              			<option v-for="category in categories" v-bind:value="category">
+                            {{category}}
+                        </option>
+                    </select>
+                    <input-search v-model="inputSearch" @input="updateSelf" ></input-search>
+
+              <div v-show="message">
+                        <h5>{{message}}</h5>
+                </div>
+              </div>`,
+
+    props: ['categories', 'selected', 'message', 'inputSearch'],
+    methods: {
+        updateSelf(val) {
+            this.$emit('input', val)
+        },
+        updateSelect(val) {
+            console.log(val.currentTarget.value)
+            this.$emit('update', val.currentTarget.value)
+        }
+    }
+}
+
 const resultsComponent = {
     template: `<div>
                 <h3>Results</h3>
-                <ol v-for="result in results">
-                    <li v-for="r in result">
-                        <span @click="$root.getDetailedResultClickHandler(r)">{{r.name}}</span>
+                <ol>
+                    <li v-for="result in results">
+                        <span @click="$root.getDetailedResultClickHandler(result)">{{result.name}}</span>
                     </li>
                 </ol>
             </div>`,
@@ -16,6 +55,8 @@ const resultsComponent = {
 const moreDetailsComponent = {
     template: `<div>
                 <span id="breadcrumb" @click="$root.listResults">Results </span>\> <span id="currentBreadCrumb">{{result.name}}</span>
+                <br/>
+                <img src="https://pbs.twimg.com/profile_images/3458870084/01be7a6f27e243f7a205698006d115b1_400x400.png" width="200" height="200"/>
                 <div id="details-ul">
                     <ul v-for="(value, key) in result">
                         <span id="label" class="badge badge-secondary">{{key}}</span> <br>
@@ -31,20 +72,24 @@ const historyComponent = {
                 <h3>Previous Search History</h3>
                 <ul v-for="s in searched">
                     <li>
-                        <span @click="$root.searchHistoryClickHandler(s.keyword)">{{s.keyword}}</span>
+                        <span @click="$root.searchHistoryClickHandler(s.id)">{{s.search.query}}</span>
                     </li> 
                 </ul>
             </div>`,
     props: ['searched']
 }
 
+
+
 const socket = io()
 const app = new Vue({
     el: '#got-app',
     data: {
         //(searchType, page = 1, pageSize = 10, queryType = null, query = null, answers = null)
+        selected: 'characters name',
+        categories: ['characters name', 'houses name', 'houses region', 'books name'],
         search: {
-            searchType: character,
+            searchType: null,
             pageSize: 10,
             page: 1,
             queryType: null,
@@ -58,12 +103,15 @@ const app = new Vue({
     },
     methods: {
         searchHandler: function () {
-            if (!this.search) return
-            
+            const selectedArray = this.selected.split(" ")
+            console.log(selectedArray)
+            this.search.searchType = selectedArray[0]
+            this.search.queryType = selectedArray[1]
+            console.log("test search")
             socket.emit('entered-search', this.search)
         },
-        searchHistoryClickHandler: function (prevSearchedKeyword) {
-            socket.emit('clicked-history', prevSearchedKeyword)
+        searchHistoryClickHandler: function (prevSearchID) {
+            socket.emit('clicked-history', prevSearchID)
         },
         getDetailedResultClickHandler: function (ob) {
             this.detailedResult = true
@@ -72,17 +120,28 @@ const app = new Vue({
         },
         listResults: function () {
             this.detailedResult = false
+        },
+        searchUpdate: function (val) {
+            this.search.query = val
+            console.log("searchUpdate: " + val)
+            this.searchHandler()
+        },
+        selectUpdate: function (val) {
+            console.log("select update: " + val)
+            this.selected = val
         }
     },
     components: {
+        'search-component': searchComponent,
         'results-component': resultsComponent,
         'history-component': historyComponent,
-        'moredetails-component': moreDetailsComponent,
+        'moredetails-component': moreDetailsComponent
     }
 })
 
 // Client Side Socket Event
 socket.on('refresh-history', searched => {
+    console.log(searched)
     app.searched = searched
 })
 
@@ -91,31 +150,24 @@ socket.on('successful-search', search => {
     app.message = 'No results found.'
     app.results = []
 
-    if(search.results) {
-        app.message = `${search.results.length} results found for "${search.keyword}".`
-        app.results.push(search.results)
-    }    
+    if (search.results) {
+        app.message = `${search.results.length} results found for "${search.search.query}".`
+        app.results = search.results
+    }
 
     app.searched.push(search)
 })
 
 socket.on('retrieved-prev-result', retrievedResult => {
     app.results = []
-    app.search = ''
     app.detailedResult = false
-    let keywords = []
+    const keyword = retrievedResult.search.query
 
-    retrievedResult.forEach(res => {
-        app.results.push(res.results)
+    app.results = retrievedResult.results
 
-        if (!keywords.includes(res.keyword))
-            keywords.push(res.keyword)
-    })
-
-    keywords = keywords.join(',')
 
     // Since we get an array of dictonary back, we know that at most array.len = 1 & array[0] is the cached result 
-    app.results[0] !== null ? app.message = `Found ${app.results[0].length} cached results for "${keywords}".`: app.message = `No results found from cached history for "${keywords}".`
+    app.results !== null ? app.message = `Found ${app.results.length} cached results for "${keyword}".` : app.message = `No results found from cached history for "${keyword}".`
 })
 
 socket.on('err-api', err => {
