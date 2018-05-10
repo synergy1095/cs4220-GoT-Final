@@ -1,0 +1,63 @@
+html, #body {
+    height: 100%;
+}
+
+#searchAndNotification {
+    border-bottom: 1px black solid;
+}
+
+#searchAndNotifications div {
+    color: rgb(253, 56, 56); 
+    font-style: italic;
+    padding: 1%;
+}
+
+#searchAndNotifications input {
+    width: 100%;
+    margin: 0 0 2%;
+}
+
+#moreDetailsComponent #details-ul {
+    margin: 2% 0 5%;
+}
+
+#breadcrumb {
+    font-size: 1em;
+    color: blue; 
+    cursor: pointer;
+}
+
+#moreDetailsComponent #currentBreadCrumb {
+    font-size: 2em;
+    text-decoration: underline;
+}
+
+#label {
+    font-size: 1em;
+}
+
+#resultsComponent span {
+    cursor: pointer;
+}
+
+#historyComponent span {
+    cursor: pointer;
+}
+
+#leftCol {
+    border-right: 1px black solid;
+    box-shadow: 0 1px 0 0 #1f1f1f;
+}
+
+#moreDetailsComponent {
+    margin: 0
+}
+
+#leftCol, #rightCol {
+    padding: 5px 20px 0;
+}
+
+#historyComponent {
+    padding: 4px 0 0 0;
+}
+
