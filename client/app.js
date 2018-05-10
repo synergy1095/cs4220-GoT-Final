@@ -7,7 +7,6 @@ Vue.component('input-search', {
     <input @keyup.enter="updateSelf($event.target.value)" :value="value" placeholder="ENTER YOUR QUERY" type="text">`,
     methods: {
         updateSelf(value) {
-            console.log('input-search: ' + value)
             this.$emit('input', value)
         }
     }
@@ -15,9 +14,9 @@ Vue.component('input-search', {
 
 const searchComponent = {
     template: `<div id="searchAndNotifications" class="text-center">
-					<h3 class="text-left">Search</h3>
-					<select v-bind:value="selected" @change="updateSelect">
-              			<option v-for="category in categories" v-bind:value="category">
+                    <h3 class="text-left">Search</h3>
+                    <select v-bind:value="selected" @change="updateSelect">
+                        <option v-for="category in categories" v-bind:value="category">
                             {{category}}
                         </option>
                     </select>
@@ -34,7 +33,6 @@ const searchComponent = {
             this.$emit('input', val)
         },
         updateSelect(val) {
-            console.log(val.currentTarget.value)
             this.$emit('update', val.currentTarget.value)
         }
     }
@@ -104,10 +102,8 @@ const app = new Vue({
     methods: {
         searchHandler: function () {
             const selectedArray = this.selected.split(" ")
-            console.log(selectedArray)
             this.search.searchType = selectedArray[0]
             this.search.queryType = selectedArray[1]
-            console.log("test search")
             socket.emit('entered-search', this.search)
         },
         searchHistoryClickHandler: function (prevSearchID) {
@@ -123,11 +119,9 @@ const app = new Vue({
         },
         searchUpdate: function (val) {
             this.search.query = val
-            console.log("searchUpdate: " + val)
             this.searchHandler()
         },
         selectUpdate: function (val) {
-            console.log("select update: " + val)
             this.selected = val
         }
     },
@@ -141,7 +135,6 @@ const app = new Vue({
 
 // Client Side Socket Event
 socket.on('refresh-history', searched => {
-    console.log(searched)
     app.searched = searched
 })
 
