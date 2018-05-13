@@ -13,27 +13,27 @@ Vue.component('input-search', {
 })
 
 const searchComponent = {
-    template: `<div id="searchAndNotifications" class="text-center">
+    template: ` <div id="searchAndNotifications" class="text-center">
                     <h3 class="text-left">Search</h3>
-                    <select v-bind:value="selected" @change="updateSelect">
+                    <select @change="updateSelect($event.currentTarget.value)">
                         <option v-for="category in categories" v-bind:value="category">
                             {{category}}
                         </option>
                     </select>
-                    <input-search v-model="inputSearch" @input="updateSelf" ></input-search>
+                    <input-search @input="updateSearch" ></input-search>
 
-              <div v-show="message">
-                        <h5>{{message}}</h5>
-                </div>
-              </div>`,
+                    <div v-show="message">
+                            <h5>{{message}}</h5>
+                    </div>
+                </div>`,
 
-    props: ['categories', 'selected', 'message', 'inputSearch'],
+    props: ['categories', 'message'],
     methods: {
-        updateSelf(val) {
+        updateSearch(val) {
             this.$emit('input', val)
         },
         updateSelect(val) {
-            this.$emit('update', val.currentTarget.value)
+            this.$emit('update', val)
         }
     }
 }
@@ -97,15 +97,9 @@ const app = new Vue({
         message: '',
         results: [],
         result: [],
-        detailedResult: false,
+        detailedResult: false
     },
     methods: {
-        searchHandler: function () {
-            const selectedArray = this.selected.split(" ")
-            this.search.searchType = selectedArray[0]
-            this.search.queryType = selectedArray[1]
-            socket.emit('entered-search', this.search)
-        },
         searchHistoryClickHandler: function (prevSearchID) {
             socket.emit('clicked-history', prevSearchID)
         },
@@ -119,7 +113,11 @@ const app = new Vue({
         },
         searchUpdate: function (val) {
             this.search.query = val
-            this.searchHandler()
+
+            const selectedArray = this.selected.split(" ")
+            this.search.searchType = selectedArray[0]
+            this.search.queryType = selectedArray[1]
+            socket.emit('entered-search', this.search)
         },
         selectUpdate: function (val) {
             this.selected = val

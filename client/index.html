@@ -28,7 +28,7 @@
             <div class="row h-100">
                 <div id="leftCol" class="col-sm-3">
                     <!-- search -->
-                    <search-component id="searchComponent" :categories="categories" :selected="selected" :message="message" @input="searchUpdate"
+                    <search-component id="searchComponent" :categories="categories" :message="message" @input="searchUpdate"
                         @update="selectUpdate"></search-component>
                     <!-- search history -->
                     <history-component id="historyComponent" v-show="searched.length" v-bind:searched="searched"></history-component>
