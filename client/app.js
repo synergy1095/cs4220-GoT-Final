@@ -23,7 +23,7 @@ const searchComponent = {
                     <input-search @input="updateSearch" ></input-search>
 
                     <div v-show="message">
-                            <h5>{{message}}</h5>
+                        <h5>{{message}}</h5>
                     </div>
                 </div>`,
 
@@ -83,7 +83,6 @@ const socket = io()
 const app = new Vue({
     el: '#got-app',
     data: {
-        //(searchType, page = 1, pageSize = 10, queryType = null, query = null, answers = null)
         selected: 'characters name',
         categories: ['characters name', 'houses name', 'houses region', 'books name'],
         search: {
@@ -156,8 +155,6 @@ socket.on('retrieved-prev-result', retrievedResult => {
 
     app.results = retrievedResult.results
 
-
-    // Since we get an array of dictonary back, we know that at most array.len = 1 & array[0] is the cached result 
     app.results !== null ? app.message = `Found ${app.results.length} cached results for "${keyword}".` : app.message = `No results found from cached history for "${keyword}".`
 })
 
